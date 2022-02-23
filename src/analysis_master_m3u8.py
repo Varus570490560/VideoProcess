@@ -1,3 +1,5 @@
+import os
+
 import requests
 import urllib
 
@@ -25,6 +27,52 @@ def analysis_master():
             if line[0] == '#':
                 continue
             else:
-                line = line[:len(line)-1]
+                line = line[:len(line) - 1]
                 response = requests.get(url=line, headers=headers, allow_redirects=True)
-                print(response.content)
+                with open('/Users/rockey211224/PycharmProjects/VideoProcess/m3u8/' + find_file_name(line), 'wb') as out:
+                    out.write(line.encode())
+                    out.write('\n'.encode())
+                    out.write(response.content.decode('utf8').encode())
+
+
+def find_file_name(url):
+    while True:
+        n = url.find('/')
+        if n == -1:
+            return url
+        else:
+            url = url[n + 1:]
+
+
+def find_name(name):
+    return name[:name.find('.')]
+
+
+def find_domain(url):
+    n = len(url) - 1
+    while url[n] != '/':
+        n = n - 1
+    return url[:n]
+
+
+def analysis_m3u8():
+    for root, dirs, files in os.walk('/Users/rockey211224/PycharmProjects/VideoProcess/m3u8'):
+        for file in files:
+            if not os.path.exists('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file)):
+                os.mkdir('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file))
+            with open('/Users/rockey211224/PycharmProjects/VideoProcess/m3u8/' + file, 'r') as m:
+                base = find_domain(m.readline())
+                while True:
+                    line = m.readline()
+                    if not line:
+                        break
+                    if line[0] == '#':
+                        continue
+                    else:
+                        line = line[:len(line) - 1]
+                        response = requests.get(url=base + '/' + line)
+                        print(base + line)
+                        print(response)
+                        with open('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file) +'/'+ line,
+                                  'wb') as w:
+                            w.write(response.content)
