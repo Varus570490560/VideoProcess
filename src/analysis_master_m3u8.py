@@ -73,6 +73,11 @@ def analysis_m3u8():
                         response = requests.get(url=base + '/' + line)
                         print(base + line)
                         print(response)
-                        with open('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file) +'/'+ line,
+                        with open('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file) + '/' + line,
                                   'wb') as w:
                             w.write(response.content)
+
+
+def generate_video_list():
+    pass
+
