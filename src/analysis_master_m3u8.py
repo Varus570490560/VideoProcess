@@ -1,7 +1,6 @@
 import os
-
+import config_parse
 import requests
-import urllib
 
 headers = {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -29,10 +28,12 @@ def analysis_master():
             else:
                 line = line[:len(line) - 1]
                 response = requests.get(url=line, headers=headers, allow_redirects=True)
-                with open('/Users/rockey211224/PycharmProjects/VideoProcess/m3u8/' + find_file_name(line), 'wb') as out:
+                with open(config_parse.get_path() + '/VideoProcess/m3u8/' + find_file_name(line), 'wb') as out:
                     out.write(line.encode())
                     out.write('\n'.encode())
                     out.write(response.content.decode('utf8').encode())
+                    break
+    print('master analysis completely!!!')
 
 
 def find_file_name(url):
@@ -56,11 +57,11 @@ def find_domain(url):
 
 
 def analysis_m3u8():
-    for root, dirs, files in os.walk('/Users/rockey211224/PycharmProjects/VideoProcess/m3u8'):
+    for root, dirs, files in os.walk(config_parse.get_path() + '/VideoProcess/m3u8'):
         for file in files:
-            if not os.path.exists('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file)):
-                os.mkdir('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file))
-            with open('/Users/rockey211224/PycharmProjects/VideoProcess/m3u8/' + file, 'r') as m:
+            if not os.path.exists(config_parse.get_path() + '/VideoProcess/ts/' + find_name(file)):
+                os.mkdir(config_parse.get_path() + '/VideoProcess/ts/' + find_name(file))
+            with open(config_parse.get_path() + '/VideoProcess/m3u8/' + file, 'r') as m:
                 base = find_domain(m.readline())
                 while True:
                     line = m.readline()
@@ -73,11 +74,29 @@ def analysis_m3u8():
                         response = requests.get(url=base + '/' + line)
                         print(base + line)
                         print(response)
-                        with open('/Users/rockey211224/PycharmProjects/VideoProcess/ts/' + find_name(file) + '/' + line,
+                        with open(config_parse.get_path() + '/VideoProcess/ts/' + find_name(file) + '/' + line,
                                   'wb') as w:
                             w.write(response.content)
 
 
 def generate_video_list():
-    pass
+    for root, dirs, files in os.walk(config_parse.get_path() + '/VideoProcess/m3u8'):
+        for file in files:
+            with open(config_parse.get_path()+'/VideoProcess/m3u8/'+file, 'r') as r:
+                domain_url = find_domain(remove_new_line(r.readline()))
+                with open(config_parse.get_path()+'/VideoProcess/video_list/'+file,'wb') as w:
+                    while True:
+                        line = r.readline()
+                        if not line:
+                            break
+                        if line[0] == '#':
+                            continue
+                        else:
+                            input = ("file '" + config_parse.get_path() + "/VideoProcess/ts/" +find_name(file)+'/' + remove_new_line(line) + "'").encode()
+                            w.write(input)
+                            w.write('\n'.encode())
+    print('Generate video list completely!!!')
 
+
+def remove_new_line(input):
+    return input[:len(input) - 1]
