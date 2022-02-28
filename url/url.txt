@@ -1,0 +1,1 @@
+https://mollusk.apis.ign.com/graphql?operationName=VideoPlayerProps&variables=%7B%22videoId%22%3A%22ccb26c930feed7d458f3ed20ba562be7%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22ef401f728f7976541dd0c9bd7e337fbec8c3cb4fec5fa64e3d733d838d608e34%22%7D%7D
